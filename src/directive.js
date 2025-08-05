@@ -5,6 +5,20 @@ function applyGhostEffect(el) {
   underline.className = "vfg-underline";
   el.parentNode.insertBefore(underline, el.nextSibling);
 
+  const id = el.getAttribute("id");
+  if (id) {
+    const label = document.querySelector('label[for="' + id + '"]');
+    if (label) {
+      label.classList.add("vfg-label");
+      el.addEventListener("focus", () =>
+        label.classList.add("vfg-label-active")
+      );
+      el.addEventListener("blur", () => {
+        if (!el.value) label.classList.remove("vfg-label-active");
+      });
+    }
+  }
+
   el.addEventListener("blur", () => {
     if (el.required && !el.value) {
       el.classList.add("vfg-error");
