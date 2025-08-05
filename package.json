@@ -1,6 +1,6 @@
 {
   "name": "vue-form-ghost",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A Vue directive that adds animated floating labels, error/success visuals, and RTL/Dark Mode support with zero configuration.",
   "main": "dist/vue-form-ghost.min.js",
   "files": [
