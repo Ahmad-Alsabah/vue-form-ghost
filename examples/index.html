@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>vue-form-ghost Demo</title>
+    <title>vue-form-ghost Full Demo</title>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.min.js"></script>
     <script src="../dist/vue-form-ghost.min.js"></script>
     <style>
@@ -15,7 +15,8 @@
         position: relative;
         margin-bottom: 2rem;
       }
-      input {
+      input,
+      textarea {
         padding: 10px;
         width: 300px;
         font-size: 16px;
@@ -34,13 +35,11 @@
         pointer-events: none;
         transition: all 0.2s ease;
       }
-
       .vfg-label-active {
         top: -12px;
         font-size: 12px;
         color: #007bff;
       }
-
       .vfg-base:focus {
         border-color: #007bff;
       }
@@ -82,15 +81,18 @@
   </head>
   <body>
     <div id="app">
+      <h2>🎯 vue-form-ghost Full Demo</h2>
+
       <div class="form-group">
         <input
           type="text"
           name="username"
           v-form-ghost
-          required
           placeholder="Username"
+          required
         />
       </div>
+
       <div class="form-group">
         <label for="email">Email</label>
         <input id="email" type="email" v-form-ghost required />
@@ -104,12 +106,47 @@
           required
           placeholder="Password"
         />
+        <span class="vfg-underline"></span>
+      </div>
+
+      <div class="form-group" dir="rtl">
+        <input
+          type="text"
+          name="arabic"
+          v-form-ghost
+          placeholder="الاسم بالعربية"
+        />
+      </div>
+
+      <div class="form-group">
+        <textarea
+          name="bio"
+          rows="3"
+          v-form-ghost
+          placeholder="Tell us about yourself..."
+        ></textarea>
+      </div>
+
+      <div class="form-group">
+        <input
+          type="text"
+          id="errorInput"
+          v-form-ghost
+          placeholder="Will shake on error"
+        />
+        <button onclick="simulateError()">Trigger Error</button>
       </div>
     </div>
 
     <script>
       Vue.use(VueFormGhost);
       new Vue({ el: "#app" });
+
+      function simulateError() {
+        const input = document.getElementById("errorInput");
+        input.classList.add("vfg-error");
+        setTimeout(() => input.classList.remove("vfg-error"), 1000);
+      }
     </script>
   </body>
 </html>

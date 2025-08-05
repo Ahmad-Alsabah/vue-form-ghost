@@ -5,6 +5,16 @@ function applyGhostEffect(el) {
   underline.className = "vfg-underline";
   el.parentNode.insertBefore(underline, el.nextSibling);
 
+  const successIcon = document.createElement("span");
+  successIcon.className = "vfg-success";
+  successIcon.innerHTML = "✓";
+  el.parentNode.insertBefore(successIcon, underline.nextSibling);
+
+  const errorMsg = document.createElement("div");
+  errorMsg.className = "vfg-error-msg";
+  errorMsg.innerText = "هذا الحقل مطلوب";
+  el.parentNode.insertBefore(errorMsg, successIcon.nextSibling);
+
   const id = el.getAttribute("id");
   if (id) {
     const label = document.querySelector('label[for="' + id + '"]');
@@ -22,8 +32,23 @@ function applyGhostEffect(el) {
   el.addEventListener("blur", () => {
     if (el.required && !el.value) {
       el.classList.add("vfg-error");
+      errorMsg.style.display = "block";
+      successIcon.style.display = "none";
     } else {
       el.classList.remove("vfg-error");
+      errorMsg.style.display = "none";
+      if (el.value) {
+        successIcon.style.display = "inline";
+      } else {
+        successIcon.style.display = "none";
+      }
+    }
+  });
+
+  el.addEventListener("input", () => {
+    if (el.value && el.classList.contains("vfg-error")) {
+      el.classList.remove("vfg-error");
+      errorMsg.style.display = "none";
     }
   });
 }
