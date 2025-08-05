@@ -1,5 +1,18 @@
-function applyGhostEffect(el) {
-  el.classList.add("vfg-base");
+let globalOptions = {};
+
+function applyGhostEffect(el, options = {}) {
+  const finalOptions = { ...globalOptions, ...options };
+
+  if (finalOptions.themeClass) {
+    el.classList.add(finalOptions.themeClass);
+  }
+
+  if (
+    !el.classList.contains("form-control") &&
+    !el.classList.contains("input")
+  ) {
+    el.classList.add("vfg-base");
+  }
 
   const underline = document.createElement("span");
   underline.className = "vfg-underline";
@@ -8,11 +21,25 @@ function applyGhostEffect(el) {
   const successIcon = document.createElement("span");
   successIcon.className = "vfg-success";
   successIcon.innerHTML = "✓";
+  successIcon.style.display = "none";
   el.parentNode.insertBefore(successIcon, underline.nextSibling);
+
+  const lang = (document.documentElement.lang || navigator.language || "en")
+    .toLowerCase()
+    .startsWith("ar")
+    ? "ar"
+    : "en";
+
+  const messages = {
+    ar: "هذا الحقل مطلوب",
+    en: "This field is required",
+    ...(finalOptions.errorMessages || {}),
+  };
 
   const errorMsg = document.createElement("div");
   errorMsg.className = "vfg-error-msg";
-  errorMsg.innerText = "هذا الحقل مطلوب";
+  errorMsg.innerText = messages[lang] || messages["en"];
+  errorMsg.style.display = "none";
   el.parentNode.insertBefore(errorMsg, successIcon.nextSibling);
 
   const id = el.getAttribute("id");
@@ -20,6 +47,10 @@ function applyGhostEffect(el) {
     const label = document.querySelector('label[for="' + id + '"]');
     if (label) {
       label.classList.add("vfg-label");
+      if (document.dir === "rtl" || finalOptions.rtl) {
+        label.style.left = "auto";
+        label.style.right = "10px";
+      }
       el.addEventListener("focus", () =>
         label.classList.add("vfg-label-active")
       );
@@ -27,6 +58,16 @@ function applyGhostEffect(el) {
         if (!el.value) label.classList.remove("vfg-label-active");
       });
     }
+  }
+
+  const dark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+  if (dark) {
+    el.style.borderBottomColor = "#aaa";
+    if (id) {
+      const label = document.querySelector('label[for="' + id + '"]');
+      if (label) label.style.color = "#ccc";
+    }
+    successIcon.style.color = "#0f0";
   }
 
   el.addEventListener("blur", () => {
@@ -37,11 +78,7 @@ function applyGhostEffect(el) {
     } else {
       el.classList.remove("vfg-error");
       errorMsg.style.display = "none";
-      if (el.value) {
-        successIcon.style.display = "inline";
-      } else {
-        successIcon.style.display = "none";
-      }
+      successIcon.style.display = el.value ? "inline" : "none";
     }
   });
 
@@ -54,18 +91,21 @@ function applyGhostEffect(el) {
 }
 
 const directive = {
-  mounted(el) {
-    applyGhostEffect(el);
+  mounted(el, binding) {
+    applyGhostEffect(el, binding?.value);
   },
-  inserted(el) {
-    applyGhostEffect(el);
+  inserted(el, binding) {
+    applyGhostEffect(el, binding?.value);
   },
 };
 
 export default {
-  install(appOrVue) {
+  install(appOrVue, options = {}) {
+    globalOptions = options;
+
     const isVue3 =
       typeof appOrVue.version === "string" && appOrVue.version.startsWith("3");
+
     if (isVue3) {
       appOrVue.directive("form-ghost", directive);
     } else {
